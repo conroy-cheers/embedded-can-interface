@@ -1,5 +1,7 @@
 //! Common CAN interface traits with Tx/Rx split.
 
+#![allow(async_fn_in_trait)]
+
 use core::time::Duration;
 use embedded_can::{ExtendedId, StandardId};
 
@@ -67,6 +69,41 @@ pub trait RxFrameIo {
     fn wait_not_empty(&mut self) -> Result<(), Self::Error>;
 }
 
+/// Async transmit-side frame I/O.
+pub trait AsyncTxFrameIo {
+    /// Frame type.
+    type Frame;
+    /// Error type.
+    type Error;
+
+    /// Asynchronously send a frame.
+    async fn send(&mut self, frame: &Self::Frame) -> Result<(), Self::Error>;
+
+    /// Asynchronously send a frame with a timeout (when supported by the backend).
+    async fn send_timeout(
+        &mut self,
+        frame: &Self::Frame,
+        timeout: Duration,
+    ) -> Result<(), Self::Error>;
+}
+
+/// Async receive-side frame I/O.
+pub trait AsyncRxFrameIo {
+    /// Frame type.
+    type Frame;
+    /// Error type.
+    type Error;
+
+    /// Asynchronously receive a frame.
+    async fn recv(&mut self) -> Result<Self::Frame, Self::Error>;
+
+    /// Asynchronously receive a frame with a timeout (when supported by the backend).
+    async fn recv_timeout(&mut self, timeout: Duration) -> Result<Self::Frame, Self::Error>;
+
+    /// Asynchronously wait until the receive queue is non-empty.
+    async fn wait_not_empty(&mut self) -> Result<(), Self::Error>;
+}
+
 /// Convenience marker for types that implement both Tx and Rx for the same frame/error.
 pub trait FrameIo:
     TxFrameIo<Frame = <Self as RxFrameIo>::Frame, Error = <Self as RxFrameIo>::Error> + RxFrameIo
@@ -75,6 +112,21 @@ pub trait FrameIo:
 
 impl<T> FrameIo for T where
     T: TxFrameIo<Frame = <T as RxFrameIo>::Frame, Error = <T as RxFrameIo>::Error> + RxFrameIo
+{
+}
+
+/// Convenience marker for types that implement both async Tx and async Rx for the same frame/error.
+pub trait AsyncFrameIo:
+    AsyncTxFrameIo<Frame = <Self as AsyncRxFrameIo>::Frame, Error = <Self as AsyncRxFrameIo>::Error>
+    + AsyncRxFrameIo
+{
+}
+
+impl<T> AsyncFrameIo for T where
+    T: AsyncTxFrameIo<
+            Frame = <T as AsyncRxFrameIo>::Frame,
+            Error = <T as AsyncRxFrameIo>::Error,
+        > + AsyncRxFrameIo
 {
 }
 
