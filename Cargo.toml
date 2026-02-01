@@ -1,7 +1,14 @@
 [package]
 name = "embedded-can-interface"
+description = "Small interface traits for CAN drivers and protocol layers"
 version = "0.1.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
+keywords = ["io", "hal"]
+documentation = "https://docs.rs/embedded-can-interface"
+repository = "https://github.com/conroy-cheers/embedded-can-interface"
+readme = "README.md"
+exclude = [".envrc", "*.nix", "flake.lock"]
 
 [dependencies]
 embedded-can = "0.4.1"
