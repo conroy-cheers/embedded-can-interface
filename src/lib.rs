@@ -123,10 +123,8 @@ pub trait AsyncFrameIo:
 }
 
 impl<T> AsyncFrameIo for T where
-    T: AsyncTxFrameIo<
-            Frame = <T as AsyncRxFrameIo>::Frame,
-            Error = <T as AsyncRxFrameIo>::Error,
-        > + AsyncRxFrameIo
+    T: AsyncTxFrameIo<Frame = <T as AsyncRxFrameIo>::Frame, Error = <T as AsyncRxFrameIo>::Error>
+        + AsyncRxFrameIo
 {
 }
 
