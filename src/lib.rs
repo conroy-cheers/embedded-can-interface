@@ -65,6 +65,7 @@
 //! - `async fn` in traits is permitted via `#![allow(async_fn_in_trait)]` to keep the interface
 //!   ergonomic for consumers; concrete drivers can still choose how to implement async operations.
 
+#![no_std]
 #![allow(async_fn_in_trait)]
 
 use core::time::Duration;
